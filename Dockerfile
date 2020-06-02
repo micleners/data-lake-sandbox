@@ -1,6 +1,6 @@
 FROM svajiraya/glue-dev-1.0
 
-RUN python3 -m pip install pytest pandas
+RUN python3 -m pip install pytest pandas pyspark
 
 WORKDIR /work
 ADD . .

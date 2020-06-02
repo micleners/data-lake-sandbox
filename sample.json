@@ -1,0 +1,34 @@
+[
+  {
+    "id": "000003",
+    "firstName": "Edgar",
+    "lastName": "Costa",
+    "birthDate": "1985-03-19",
+    "zipCode": "96828",
+    "modifiedDate": "2020-06-02T15:47:10.394Z"
+  },
+  {
+    "id": "000004",
+    "firstName": "Brandon",
+    "lastName": "Kühn",
+    "birthDate": "2000-04-04",
+    "zipCode": "66556",
+    "modifiedDate": "2020-06-02T15:47:10.394Z"
+  },
+  {
+    "id": "000004",
+    "firstName": "Bruce",
+    "lastName": "Takada",
+    "birthDate": "1994-03-16",
+    "zipCode": "30955",
+    "modifiedDate": "2020-06-02T15:47:10.394Z"
+  },
+  {
+    "id": "000003",
+    "firstName": "Polly",
+    "lastName": "Flowers",
+    "birthDate": "1955-05-20",
+    "zipCode": "86073",
+    "modifiedDate": "2020-06-02T15:47:10.395Z"
+  }
+]
