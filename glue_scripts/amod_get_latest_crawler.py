@@ -35,10 +35,14 @@ job.init(args['JOB_NAME'], args)
 ## @args: [database = "cdc-demo-database", table_name = "raw_events", transformation_ctx = "datasource0"]
 ## @return: datasource0
 ## @inputs: []
-datasource0 = glueContext.create_dynamic_frame.from_catalog(
+df = glueContext.create_dynamic_frame.from_catalog(
         database = "cdc-demo-database",
         table_name = "raw_events",
         transformation_ctx = "datasource0")
+
+# create_dynamic_frame.from_path instead of from catalog to go straight from the bucket
+# skip the crawl step and go straight to raw bucket
+# will be helpful if we have all 7 tables pushing into one bucket
 
 # From Paul and Jon
 # df = glueContext.create_dynamic_frame_from_catalog(
@@ -105,7 +109,7 @@ applymapping1 = ApplyMapping.apply(frame = datasource0, mappings = [("payload.be
 ## @inputs: [frame = applymapping1]
 
 datasink2 = glueContext.write_dynamic_frame.from_options(
-  frame = applymapping1,
+  frame = df,
   connection_type = "s3",
   connection_options = {"path": "s3://database.db2inst1.example-table"},
   format = "csv",
