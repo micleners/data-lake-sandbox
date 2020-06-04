@@ -8,7 +8,7 @@ from pandas.testing import assert_frame_equal
 from awsglue.context import GlueContext, DynamicFrame
 from pyspark.sql.types import StructField, StructType, StringType, DateType, TimestampType
 # import glue_scripts.merge_into_customer_dim as merge_into_customer_dim
-import glue_scripts.crawl_1 as marge_into_customer_dim
+import glue_scripts.crawl_1 as merge_into_customer_dim
 from glue_scripts.pyspark_htest import PySparkTest
 from awsglue.job import Job
 
