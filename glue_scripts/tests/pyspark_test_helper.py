@@ -49,7 +49,13 @@ class PySparkTest(unittest.TestCase):
             by=keycolumns
         ).reset_index(drop=True)
 
+        print('expected')
+        print(expected.show())
+        print('actual')
+        print(actual.show())
+
         act_pd = actual.toPandas().sort_values(
             by=keycolumns
         ).reset_index(drop=True)
+
         return assert_frame_equal(act_pd, exp_pd)

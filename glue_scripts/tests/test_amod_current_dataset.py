@@ -6,20 +6,16 @@ from datetime import date, datetime
 from pyspark.sql import SparkSession
 from pandas.testing import assert_frame_equal
 from awsglue.context import GlueContext, DynamicFrame
-from pyspark.sql.types import StructField, StructType, StringType, DateType, TimestampType
+from pyspark.sql.types import StructField, StructType, StringType, DateType, TimestampType, IntegerType
+import glue_scripts.amod_current_dataset as merge_into_customer_dim
 # import glue_scripts.merge_into_customer_dim as merge_into_customer_dim
-import glue_scripts.crawl_1 as merge_into_customer_dim
-from glue_scripts.pyspark_htest import PySparkTest
+from glue_scripts.tests.pyspark_test_helper import PySparkTest
 from awsglue.job import Job
 
 class TestMergeIntoCustomerDim(PySparkTest):
     output_schema = StructType([
-        StructField("id", StringType(), True),
-        StructField("first_name", StringType(), True),
-        StructField("last_name", StringType(), True),
-        StructField("birth_date", DateType(), True),
-        StructField("zipcode", StringType(), True),
-        StructField("modified_date", TimestampType(), True)
+        StructField("ID", IntegerType(), True),
+        StructField("Name", StringType(), True),
     ])
 
     argv = ["",
@@ -30,15 +26,12 @@ class TestMergeIntoCustomerDim(PySparkTest):
 
     def __mock_staging(self, glue_context, rows):
         input_df = self.spark.createDataFrame(rows)
+        print('input df')
+        print(input_df.show())
         dynamic_df = DynamicFrame.fromDF(input_df, glue_context, 'staging_df')
-        dynamic_df.show()
+        print('dynamic df')
+        print(dynamic_df.show())
         glue_context.create_dynamic_frame_from_catalog = MagicMock(return_value=dynamic_df)
-
-    def __mock_existing_target(self, glue_context, rows):
-        existing_target_df = self.spark.createDataFrame(rows, self.output_schema)
-        dynamic_df = DynamicFrame.fromDF(existing_target_df, glue_context, 'existing_target_df')
-        dynamic_df.show()
-        glue_context.create_dynamic_frame_from_options = MagicMock(return_value=dynamic_df)
 
     def test_sanity(self):
         assert 1 == 1
@@ -48,36 +41,41 @@ class TestMergeIntoCustomerDim(PySparkTest):
         glue_context = GlueContext(self.spark)
         self.__mock_staging(glue_context, [
                 {
-                "schema": {},
-                "payload": {
-                  "before": { "ID": 158, "NAME": "388645.04.14.02-92-50-0202--6tsetadbmal" },
-                  "after": { "ID": 158, "NAME": "7tsetadbmal" },
-                  "source": {
-                    "ts_ms": 1591035016774,
-                    "db": "testdb",
-                    "schema": "DB2INST1",
-                    "table": "EXAMPLE_TABLE",
-                    "change_lsn": "00000000:00000000:0000000006f4b31f",
-                    "commit_lsn": "00000000:000102b5:000000000007bf55"
-                  },
-                  "op": "u",
-                  "ts_ms": 1591017016750,
-                  "transaction": null
+                    "payload": {
+                        "before": {"ID": 158, "NAME": "6tsetadbmal" },
+                        "after": {"ID": 158, "NAME": "7tsetadbmal" },
+                        "source": {
+                        "version": "1.2.0.Beta2",
+                        "connector": "db2",
+                        "name": "database",
+                        "ts_ms": 1591035016774,
+                        "snapshot": "false",
+                        "db": "testdb",
+                        "schema": "DB2INST1",
+                        "table": "EXAMPLE_TABLE",
+                        "change_lsn": "00000000:00000000:0000000006f4b31f",
+                        "commit_lsn": "00000000:000102b5:000000000007bf55"
+                        },
+                        "op": "u",
+                        "ts_ms": 1591017016750
+                    }
                 }
-              }
             ])
-        self.__mock_existing_target(glue_context, [])
+        # self.__mock_existing_target(glue_context, [])
         glue_context.write_dynamic_frame_from_options = MagicMock()
         glue_context.purge_s3_path = MagicMock()
 
         merge_into_customer_dim.main(self.argv, glue_context, mock_job)
 
         expected_df = input_df = self.spark.createDataFrame([
-                ["01", "John", "Smith", date(1990, 1, 1), "12345", datetime.fromisoformat("2019-01-01T00:40:32+00:00")]
+                [158, "7tsetadbmal"]
             ], schema=self.output_schema)
 
         write_args, write_kargs = glue_context.write_dynamic_frame_from_options.call_args
-        self.assert_dataframe_equal(write_kargs['frame'].toDF(), expected_df, ["id"])
+        print('write_kargs')
+        print(write_kargs['frame'].toDF().show())
+        print(write_kargs['frame'])
+        self.assert_dataframe_equal(write_kargs['frame'].toDF(), expected_df, ["ID"])
 
     # @patch('awsglue.job.Job')
     # def test_the_target_path_is_purged(self, mock_job):

@@ -1,6 +1,6 @@
 version: '3'
 services:
-  build:
+  data-lake-scripts:
+    build: .
     volumes:
-      - ./glue_scripts:/work/glue_scripts
-    dockerfile: Dockerfile
+      - ./:/work/
